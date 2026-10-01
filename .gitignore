@@ -33,3 +33,6 @@ Thumbs.db
 media/
 staticfiles/
 FIXES.md
+LATEST_UPDATES.md
+
+.env.example
