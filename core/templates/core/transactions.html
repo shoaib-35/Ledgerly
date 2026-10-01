@@ -1,0 +1,66 @@
+{% extends 'core/base.html' %}
+{% load core_extras %}
+{% block title %}Transactions | Ledgerly{% endblock %}
+{% block heading %}Transactions{% endblock %}
+{% block content %}
+<section class="intro-band compact-intro"><p class="section-kicker">Financial history</p><p class="intro-copy">Search and review every active and voided financial event.</p></section>
+<section class="action-section transaction-tools" aria-labelledby="transaction-data-title">
+    <div class="section-heading">
+        <div><p class="section-kicker">Data management</p><h2 id="transaction-data-title">Import &amp; export</h2></div>
+    </div>
+    <div class="action-grid action-grid-three">
+        <a class="action-card compact" href="/transactions/import/"><span class="action-icon">⇧</span><span><strong>Import transactions</strong><small>CSV, XLS or XLSX</small></span><span class="action-chevron">›</span></a>
+        <a class="action-card compact" href="/transactions/export/?format=xlsx"><span class="action-icon">↓</span><span><strong>Export XLSX</strong><small>Excel workbook</small></span><span class="action-chevron">›</span></a>
+        <a class="action-card compact" href="/transactions/export/?format=csv"><span class="action-icon">↓</span><span><strong>Export CSV</strong><small>Universal spreadsheet format</small></span><span class="action-chevron">›</span></a>
+    </div>
+    <p class="muted transaction-tools-note">Need the legacy Excel format? <a href="/transactions/export/?format=xls">Export XLS</a></p>
+</section>
+
+<section class="content-section" aria-labelledby="transaction-list-title">
+    <div class="section-heading"><div><p class="section-kicker">Financial history</p><h2 id="transaction-list-title">Recent activity</h2></div><a href="/transactions/new/">+ Add transaction</a></div>
+
+    <form method="get" action="/transactions/" class="filter-form">
+        <input type="search" name="search" value="{{ filters.search }}" placeholder="Search description, person or account" class="search-input">
+        <details class="filters">
+            <summary class="filters-toggle">Filters{% if active_filters %} ({{ active_filters }} active){% endif %}</summary>
+            <div class="filters-body">
+                <label>Person<select name="person_id"><option value="">All people</option>{% for p in people %}<option value="{{ p.id }}" {% if filters.person_id == p.id|stringformat:'s' %}selected{% endif %}>{{ p.name }}</option>{% endfor %}</select></label>
+                <label>Account<select name="account_id"><option value="">All accounts</option>{% for a in accounts %}<option value="{{ a.id }}" {% if filters.account_id == a.id|stringformat:'s' %}selected{% endif %}>{{ a.name }}</option>{% endfor %}</select></label>
+                <label>Account type<select name="account_type"><option value="">All</option><option value="BANK" {% if filters.account_type == 'BANK' %}selected{% endif %}>Bank</option><option value="CREDIT_CARD" {% if filters.account_type == 'CREDIT_CARD' %}selected{% endif %}>Credit card</option></select></label>
+                <label>Type<select name="transaction_type"><option value="">All types</option>{% for value, label in transaction_types %}<option value="{{ value }}" {% if filters.transaction_type == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></label>
+                <label>Status<select name="status"><option value="">All statuses</option><option value="ACTIVE" {% if filters.status == 'ACTIVE' %}selected{% endif %}>Active</option><option value="VOIDED" {% if filters.status == 'VOIDED' %}selected{% endif %}>Voided</option></select></label>
+                <label>From<input type="date" name="date_from" value="{{ filters.date_from }}"></label>
+                <label>To<input type="date" name="date_to" value="{{ filters.date_to }}"></label>
+                <label>Min amount<input inputmode="decimal" name="amount_min" value="{{ filters.amount_min }}"></label>
+                <label>Max amount<input inputmode="decimal" name="amount_max" value="{{ filters.amount_max }}"></label>
+                <div class="filters-actions"><a href="/transactions/">Clear</a><button type="submit">Apply</button></div>
+            </div>
+        </details>
+    </form>
+
+    <div class="transaction-list page-list transaction-table">
+        <div class="transaction-header">
+            <span>Description</span><span>Type</span><span>Account</span><span>Amount</span><span>Balance after</span><span></span>
+        </div>
+        {% for row in rows %}
+        {% with item=row.transaction %}
+        <article class="transaction-row grid-row {% if item.status == 'VOIDED' %}voided{% endif %}">
+            <div class="cell-description"><h3>{{ item.description }}</h3><span class="muted">{{ item.date }}{% if item.person %} &middot; {{ item.person.name }}{% endif %}</span></div>
+            <span class="account-type">{{ item.get_transaction_type_display }}{% if item.status == 'VOIDED' %} &middot; Voided{% endif %}</span>
+            <span>{% if item.transaction_type == 'TRANSFER' and item.money_transfer_details %}{{ item.money_transfer_details.source_account.name }} → {{ item.money_transfer_details.destination_account.name }}<br><span class="muted">Account transfer</span>{% else %}{{ item.account.name }}<br><span class="muted">{{ item.account.get_account_type_display }}</span>{% endif %}</span>
+            <strong>{{ item.amount|money:currency_symbol }}</strong>
+            <span>{% if row.balance_after is not None %}{{ row.balance_after|money:currency_symbol }}{% else %}&mdash;{% endif %}</span>
+            <span class="row-actions">
+                {% if item.status == 'ACTIVE' %}
+                {% if item.transaction_type == 'TRANSFER' %}<a href="/money-transfers/{{ item.id }}/edit/">Edit</a>{% else %}<a href="/transactions/{{ item.id }}/edit/">Edit</a>{% endif %}
+                <form method="post" action="/transactions/{{ item.id }}/void/" class="inline-form">{% csrf_token %}<button type="submit">Void</button></form>
+                {% else %}
+                <form method="post" action="/transactions/{{ item.id }}/restore/" class="inline-form">{% csrf_token %}<button type="submit">Restore</button></form>
+                {% endif %}
+            </span>
+        </article>
+        {% endwith %}
+        {% empty %}<p class="empty-state">No transactions match these filters.</p>{% endfor %}
+    </div>
+</section>
+{% endblock %}

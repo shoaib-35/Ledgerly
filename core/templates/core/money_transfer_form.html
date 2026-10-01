@@ -1,0 +1,32 @@
+{% extends 'core/base.html' %}
+{% load core_extras %}
+{% block title %}{% if transaction %}Edit{% else %}Money transfer{% endif %} | Ledgerly{% endblock %}
+{% block heading %}{% if transaction %}Edit money transfer{% else %}Money transfer{% endif %}{% endblock %}
+{% block content %}
+<section class="form-panel wide-form transfer-panel">
+    <div class="action-intro">
+        <div><p class="section-kicker">Move money between your financial accounts</p><p class="intro-copy">Transfer funds between bank accounts and credit cards without treating the movement as income or an expense.</p></div>
+        <a class="secondary-action" href="/transactions/new/">Add transaction</a>
+    </div>
+    {% if error %}<p class="form-error">{{ error }}</p>{% endif %}
+    <form method="post">
+        {% csrf_token %}
+        <label>Date<input type="date" name="date" required value="{% if transaction %}{{ transaction.date|date:'Y-m-d' }}{% else %}{{ today|date:'Y-m-d' }}{% endif %}"></label>
+        <div class="transfer-route">
+            <label>From<select name="source_account_id" required>
+                <option value="">Choose source account</option>
+                {% for account in accounts %}<option value="{{ account.id }}" {% if transaction and transaction.money_transfer_details.source_account_id == account.id %}selected{% endif %}>{{ account.name }} · {{ account.get_account_type_display }}</option>{% endfor %}
+            </select></label>
+            <div class="transfer-arrow" aria-hidden="true">→</div>
+            <label>To<select name="destination_account_id" required>
+                <option value="">Choose destination account</option>
+                {% for account in accounts %}<option value="{{ account.id }}" {% if transaction and transaction.money_transfer_details.destination_account_id == account.id %}selected{% endif %}>{{ account.name }} · {{ account.get_account_type_display }}</option>{% endfor %}
+            </select></label>
+        </div>
+        <label>Amount<input name="amount" required inputmode="decimal" value="{{ transaction.amount|default:'' }}"></label>
+        <label>Description<textarea name="description" rows="3" placeholder="Optional note">{% if transaction %}{{ transaction.description }}{% endif %}</textarea></label>
+        <p class="field-hint">Transfers update both accounts atomically. A bank source decreases its balance; a card source increases its used credit. The destination receives the corresponding amount.</p>
+        <div class="form-actions"><a href="/transactions/">Cancel</a><button type="submit">{% if transaction %}Save transfer{% else %}Transfer money{% endif %}</button></div>
+    </form>
+</section>
+{% endblock %}

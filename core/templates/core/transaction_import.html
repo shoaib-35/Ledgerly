@@ -1,0 +1,68 @@
+{% extends 'core/base.html' %}
+{% block title %}Import Transactions | Ledgerly{% endblock %}
+{% block heading %}Import transactions{% endblock %}
+{% block content %}
+<section class="intro-band compact-intro">
+    <p class="section-kicker">Safe data import</p>
+    <p class="intro-copy">Upload a Ledgerly-formatted CSV or Excel file. The import is validated before anything is written, so one bad row cannot leave a partial import behind.</p>
+</section>
+
+<section class="form-panel wide-form import-panel">
+    {% if error %}<p class="form-error">{{ error }}</p>{% endif %}
+    {% if imported is not None %}
+        <div class="import-success">
+            <strong>{{ imported }} transaction{{ imported|pluralize }} imported successfully.</strong>
+            {% if duplicates %}<span>{{ duplicates }} existing transaction{{ duplicates|pluralize }} skipped using transaction_id.</span>{% endif %}
+        </div>
+    {% endif %}
+
+    <div class="import-actions">
+        <div>
+            <p class="section-kicker">1. Start with the template</p>
+            <p class="muted import-help">Use the same columns for CSV, XLS, and XLSX. The template includes one example row that you should replace.</p>
+            <div class="import-links">
+                <a href="/transactions/import/template/?format=xlsx">XLSX template</a>
+                <a href="/transactions/import/template/?format=xls">XLS template</a>
+                <a href="/transactions/import/template/?format=csv">CSV template</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="import-divider"></div>
+
+    <form method="post" enctype="multipart/form-data" class="import-form">
+        {% csrf_token %}
+        <label>Transaction file
+            <input type="file" name="file" accept=".csv,.xlsx,.xls,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel" required>
+        </label>
+        <div class="form-actions">
+            <a href="/transactions/">Cancel</a>
+            <button type="submit">Validate &amp; import</button>
+        </div>
+    </form>
+</section>
+
+<section class="content-section import-format-section">
+    <div class="section-heading">
+        <div>
+            <p class="section-kicker">Import format</p>
+            <h2>Use these exact columns</h2>
+        </div>
+    </div>
+    <div class="import-format-card">
+        <code>transaction_id</code><span>Optional. Keep it when re-importing an export; existing IDs are skipped.</span>
+        <code>date</code><span>Required. Use <strong>YYYY-MM-DD</strong>, for example 2026-09-26.</span>
+        <code>transaction_type</code><span>Required: EXPENSE, RECEIVED, INCOME, BONUS, EXTRA, CARD_PAYMENT, or TRANSFER.</span>
+        <code>amount</code><span>Required positive amount, for example 1250.00. Do not include the currency symbol.</span>
+        <code>description</code><span>Required text describing the transaction.</span>
+        <code>status</code><span>Optional: ACTIVE or VOIDED. Blank means ACTIVE.</span>
+        <code>person_id / person_name</code><span>Use the ID for exact matching, or the exact person name. Expense and Received transactions require a person.</span>
+        <code>account_id / account_name</code><span>Normal transactions use these for the affected account. Use IDs when available.</span>
+        <code>source_account_id / source_account_name</code><span>Used by TRANSFER and BANK_ACCOUNT card payments.</span>
+        <code>destination_account_id / destination_account_name</code><span>Required for TRANSFER. This is the receiving account.</span>
+        <code>payment_source</code><span>Required for CARD_PAYMENT: BANK_ACCOUNT or CASH.</span>
+        <code>created_at</code><span>Optional ISO datetime. Exported files include it to preserve same-day transaction ordering.</span>
+    </div>
+    <p class="muted import-note"><strong>Important:</strong> account and person names must match exactly if you do not provide their UUID. If two accounts or people have the same name, use the corresponding ID from an exported Ledgerly file. Archived accounts and people cannot be used for new imports.</p>
+</section>
+{% endblock %}

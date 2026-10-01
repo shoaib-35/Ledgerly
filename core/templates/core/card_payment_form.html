@@ -1,0 +1,27 @@
+{% extends 'core/base.html' %}
+{% block title %}Card Pay | Expense Tracker{% endblock %}
+{% block heading %}Pay card{% endblock %}
+{% block content %}
+<section class="action-section form-actions-section" aria-label="Transaction actions">
+    <div class="action-grid action-grid-three">
+        <a class="action-card compact" href="/transactions/new/"><span class="action-icon">＋</span><span><strong>Add transaction</strong><small>Record an expense or money received</small></span></a>
+        <a class="action-card compact" href="/money-transfers/new/"><span class="action-icon">↔</span><span><strong>Money transfer</strong><small>Move money between accounts</small></span></a>
+        <a class="action-card compact active" href="/card-payments/new/"><span class="action-icon">▣</span><span><strong>Card payment</strong><small>Restore available card credit</small></span></a>
+    </div>
+</section>
+
+<section class="form-panel">
+    <p class="section-kicker">Restore borrowing capacity</p>
+    {% if error %}<p class="form-error">{{ error }}</p>{% endif %}
+    <form method="post">
+        {% csrf_token %}
+        <label>Credit card<select name="credit_card_id" required><option value="">Choose card</option>{% for card in credit_cards %}<option value="{{ card.id }}">{{ card.name }}</option>{% endfor %}</select></label>
+        <label>Amount<input name="amount" required inputmode="decimal"></label>
+        <label>Date<input type="date" name="date" required></label>
+        <label>Payment source<select name="payment_source" required><option value="BANK_ACCOUNT">Bank account</option><option value="CASH">Cash</option></select></label>
+        <label>Bank source account<select name="source_account_id"><option value="">None for cash</option>{% for account in bank_accounts %}<option value="{{ account.id }}">{{ account.name }}</option>{% endfor %}</select></label>
+        <label>Description<textarea name="description" rows="3">Card payment</textarea></label>
+        <div class="form-actions"><a href="/transactions/">Cancel</a><button type="submit">Pay card</button></div>
+    </form>
+</section>
+{% endblock %}

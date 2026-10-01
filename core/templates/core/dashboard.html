@@ -1,0 +1,70 @@
+{% extends 'core/base.html' %}
+{% load core_extras %}
+{% block title %}Dashboard | Ledgerly{% endblock %}
+{% block heading %}{{ greeting }}<span class="dashboard-name">{{ user_display_name }}</span>{% endblock %}
+{% block content %}
+<section class="overview-grid" aria-labelledby="overview-title">
+    <div class="section-heading"><h2 id="overview-title">Financial overview</h2><span>{{ today }}</span></div>
+    <article class="metric metric-cash"><span>Cash / bank balance</span><strong>{{ financial_overview.bank_balance|money:currency_symbol }}</strong><small>Owned cash across bank accounts</small></article>
+    <article class="metric metric-available"><span>Credit available</span><strong>{{ financial_overview.credit_available|money:currency_symbol }}</strong><small>Remaining borrowing capacity</small></article>
+    <article class="metric metric-used"><span>Credit used</span><strong>{{ financial_overview.credit_used|money:currency_symbol }}</strong><small>Borrowed across credit cards</small></article>
+</section>
+
+<section class="content-section">
+    <details class="expandable">
+        <summary><span>Financial accounts</span><span class="chevron-label">Details</span></summary>
+        <div class="account-list">
+            {% for account in accounts %}
+            {% with summary=account_summaries|get_item:account.id %}
+            <article class="account-row">
+                <div><span class="account-type">{{ account.get_account_type_display }}</span><h3>{{ account.name }}</h3></div>
+                {% if account.account_type == 'BANK' %}
+                <strong>{{ summary.balance|money:currency_symbol }}</strong>
+                {% else %}
+                <div class="transaction-meta"><strong>{{ summary.available|money:currency_symbol }}</strong><span>Used {{ summary.used|money:currency_symbol }} of {{ summary.limit|money:currency_symbol }}</span></div>
+                {% endif %}
+            </article>
+            {% endwith %}
+            {% empty %}<p class="empty-state">Your accounts will appear here.</p>{% endfor %}
+        </div>
+    </details>
+    <a class="section-link" href="/accounts/">View all accounts &rarr;</a>
+</section>
+
+<section class="content-section family-overview" aria-labelledby="family-overview-title">
+    <div class="section-heading"><div><p class="section-kicker">Ledger position</p><h2 id="family-overview-title">Family position overview</h2></div><span>Total held − total receivables = current balance</span></div>
+    <div class="overview-grid family-overview-grid">
+        <article class="metric metric-held"><span>Total held</span><strong>{{ family_position_overview.held|money:currency_symbol }}</strong><small>Money currently held for family members</small></article>
+        <article class="metric metric-receivable"><span>Total receivables</span><strong>{{ family_position_overview.receivables|money:currency_symbol }}</strong><small>Money family members currently owe</small></article>
+        <article class="metric metric-current"><span>Current balance</span><strong>{{ family_position_overview.current|money:currency_symbol }}</strong><small>Net family ledger position</small></article>
+    </div>
+</section>
+
+<section class="content-section" aria-labelledby="people-title">
+    <div class="section-heading"><h2 id="people-title">Family positions</h2><a href="/people/">View all</a></div>
+    <div class="people-grid">
+        {% for person in people %}
+        {% with position=person_positions|get_item:person.id %}
+        <article class="person-row">
+            <span class="avatar">{{ person.name|initial }}</span>
+            <div><h3>{{ person.name }}</h3><span class="muted position-{{ position|position_label|lower }}">{{ position|position_label }}</span></div>
+            <strong>{% if position|position_label != 'Settled' %}{{ position|abs_money:currency_symbol }}{% else %}&mdash;{% endif %}</strong>
+        </article>
+        {% endwith %}
+        {% empty %}<p class="empty-state">Add a person to begin tracking shared money.</p>{% endfor %}
+    </div>
+</section>
+
+<section class="content-section" aria-labelledby="recent-title">
+    <div class="section-heading"><h2 id="recent-title">Recent transactions</h2><a href="/transactions/">View history</a></div>
+    <div class="transaction-list">
+        {% for item in recent_transactions %}
+        <article class="transaction-row">
+            <div><span class="account-type">{{ item.get_transaction_type_display }}{% if item.person %} &middot; {{ item.person.name }}{% endif %}</span><h3>{{ item.description }}</h3><span class="muted">{% if item.transaction_type == 'TRANSFER' and item.money_transfer_details %}{{ item.money_transfer_details.source_account.name }} → {{ item.money_transfer_details.destination_account.name }}{% else %}{{ item.account.name }}{% endif %} &middot; {{ item.date }}</span></div>
+            <div class="transaction-meta"><strong>{{ item.amount|money:currency_symbol }}</strong></div>
+        </article>
+        {% empty %}<p class="empty-state">Your recent activity will appear here.</p>{% endfor %}
+    </div>
+    <a class="section-link" href="/transactions/">View all transactions &rarr;</a>
+</section>
+{% endblock %}

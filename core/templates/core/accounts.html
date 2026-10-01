@@ -1,0 +1,46 @@
+{% extends 'core/base.html' %}
+{% load core_extras %}
+{% block title %}Accounts | Ledgerly{% endblock %}
+{% block heading %}Accounts{% endblock %}
+{% block content %}
+<section class="intro-band compact-intro"><p class="section-kicker">Financial sources</p><p class="intro-copy">Keep owned cash and borrowing capacity visible as separate systems.</p></section>
+<section class="action-section" aria-labelledby="account-actions-title">
+    <div class="section-heading"><div><p class="section-kicker">Quick actions</p><h2 id="account-actions-title">Move money</h2></div></div>
+    <div class="action-grid">
+        <a class="action-card" href="/money-transfers/new/"><span class="action-icon">↔</span><span><strong>Money transfer</strong><small>Move money between accounts or credit cards</small></span><span class="action-chevron">›</span></a>
+        <a class="action-card" href="/accounts/new/"><span class="action-icon">＋</span><span><strong>Add account</strong><small>Add a bank account or credit card</small></span><span class="action-chevron">›</span></a>
+    </div>
+</section>
+<section class="content-section" aria-labelledby="accounts-list-title">
+    <div class="section-heading"><h2 id="accounts-list-title">All accounts</h2><a href="/accounts/new/">+ Add account</a></div>
+    <div class="account-list page-list">
+        {% for account in accounts %}
+        {% with summary=summaries|get_item:account.id %}
+        <article class="account-row full-row">
+            <div>
+                <span class="account-type">{{ account.get_account_type_display }}</span>
+                <h3>{{ account.name }}</h3>
+                <span class="muted">{{ account.status|title }} &middot; {{ counts|get_item:account.id|default:0 }} transactions</span>
+            </div>
+            <div class="transaction-meta">
+                {% if account.account_type == 'BANK' %}
+                <strong>{{ summary.balance|money:currency_symbol }}</strong><span>Current balance</span>
+                {% else %}
+                <strong>{{ summary.available|money:currency_symbol }}</strong><span>Available &middot; used {{ summary.used|money:currency_symbol }} / {{ summary.limit|money:currency_symbol }}</span>
+                {% endif %}
+            </div>
+            <span class="row-actions">
+                <a href="/transactions/?account_id={{ account.id }}">View</a>
+                {% if account.account_type == 'CREDIT_CARD' %}<a href="/card-payments/new/">Pay card</a>{% endif %}
+                <a href="/accounts/{{ account.id }}/edit/">Edit</a>
+                <form method="post" action="/accounts/{{ account.id }}/archive-toggle/" class="inline-form">
+                    {% csrf_token %}
+                    <button type="submit">{% if account.status == 'ACTIVE' %}Archive{% else %}Unarchive{% endif %}</button>
+                </form>
+            </span>
+        </article>
+        {% endwith %}
+        {% empty %}<p class="empty-state">No accounts yet. Add a bank account or credit card.</p>{% endfor %}
+    </div>
+</section>
+{% endblock %}

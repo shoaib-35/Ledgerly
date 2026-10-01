@@ -1,0 +1,29 @@
+{% extends 'core/base.html' %}
+{% block title %}{% if account %}Edit{% else %}Add{% endif %} Account | Ledgerly{% endblock %}
+{% block heading %}{% if account %}Edit account{% else %}Add account{% endif %}{% endblock %}
+{% block content %}
+<section class="form-panel">
+    <p class="section-kicker">Financial account</p>
+    {% if error %}<p class="form-error">{{ error }}</p>{% endif %}
+    <form method="post">
+        {% csrf_token %}
+        <label>Name<input name="name" required maxlength="120" autofocus value="{{ account.name|default:'' }}"></label>
+        {% if account %}
+            <input type="hidden" name="account_type" value="{{ account.account_type }}">
+            <p class="muted">Type: {{ account.get_account_type_display }} (cannot be changed)</p>
+            {% if account.account_type == 'BANK' %}
+            <label>Opening balance<input name="opening_balance" inputmode="decimal" value="{{ account.bank_details.opening_balance }}"></label>
+            {% else %}
+            <label>Credit limit<input name="credit_limit" inputmode="decimal" value="{{ account.credit_card_details.credit_limit }}"></label>
+            <p class="muted">Changing the limit only adjusts your available headroom; credit already in use is unaffected.</p>
+            {% endif %}
+        {% else %}
+            <label>Type<select name="account_type" required><option value="BANK">Bank account</option><option value="CREDIT_CARD">Credit card</option></select></label>
+            <label>Opening bank balance<input name="opening_balance" inputmode="decimal" value="0.00"></label>
+            <label>Credit limit<input name="credit_limit" inputmode="decimal" placeholder="100000.00"></label>
+            <label>Opening available credit<input name="opening_available_credit" inputmode="decimal" placeholder="100000.00"></label>
+        {% endif %}
+        <div class="form-actions"><a href="/accounts/">Cancel</a><button type="submit">{% if account %}Save changes{% else %}Create account{% endif %}</button></div>
+    </form>
+</section>
+{% endblock %}

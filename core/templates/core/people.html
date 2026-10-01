@@ -1,0 +1,35 @@
+{% extends 'core/base.html' %}
+{% load core_extras %}
+{% block title %}People | Ledgerly{% endblock %}
+{% block heading %}People{% endblock %}
+{% block content %}
+<section class="intro-band compact-intro"><p class="section-kicker">Family ledgers</p><p class="intro-copy">Track what is held, owed, and settled for each person.</p></section>
+<section class="content-section" aria-labelledby="people-list-title">
+    <div class="section-heading"><h2 id="people-list-title">All people</h2><a href="/people/new/">+ Add person</a></div>
+    <div class="people-grid page-list">
+        {% for person in people %}
+        {% with position=positions|get_item:person.id %}
+        <article class="person-row full-row">
+            <span class="avatar">{{ person.name|initial }}</span>
+            <div>
+                <h3>{{ person.name }}</h3>
+                <span class="muted">
+                    {% if person.status == 'ACTIVE' %}{{ position|position_label }}{% else %}Archived{% endif %}
+                    &middot; {{ counts|get_item:person.id|default:0 }} transactions
+                </span>
+            </div>
+            <strong>{% if person.status == 'ACTIVE' and position|position_label != 'Settled' %}{{ position|abs_money:currency_symbol }}{% else %}&mdash;{% endif %}</strong>
+            <span class="row-actions">
+                <a href="/transactions/?person_id={{ person.id }}">View</a>
+                <a href="/people/{{ person.id }}/edit/">Edit</a>
+                <form method="post" action="/people/{{ person.id }}/archive-toggle/" class="inline-form">
+                    {% csrf_token %}
+                    <button type="submit">{% if person.status == 'ACTIVE' %}Archive{% else %}Unarchive{% endif %}</button>
+                </form>
+            </span>
+        </article>
+        {% endwith %}
+        {% empty %}<p class="empty-state">No people yet. Add a person to begin.</p>{% endfor %}
+    </div>
+</section>
+{% endblock %}

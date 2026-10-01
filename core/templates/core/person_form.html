@@ -1,0 +1,14 @@
+{% extends 'core/base.html' %}
+{% block title %}{% if person %}Edit{% else %}Add{% endif %} Person | Ledgerly{% endblock %}
+{% block heading %}{% if person %}Edit person{% else %}Add person{% endif %}{% endblock %}
+{% block content %}
+<section class="form-panel">
+    <p class="section-kicker">Family ledger</p>
+    {% if error %}<p class="form-error">{{ error }}</p>{% endif %}
+    <form method="post">
+        {% csrf_token %}
+        <label>Name<input name="name" required maxlength="120" autofocus value="{{ person.name|default:'' }}"></label>
+        <div class="form-actions"><a href="/people/">Cancel</a><button type="submit">{% if person %}Save changes{% else %}Create person{% endif %}</button></div>
+    </form>
+</section>
+{% endblock %}
