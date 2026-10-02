@@ -32,7 +32,3 @@ Thumbs.db
 # Static/media generated files
 media/
 staticfiles/
-FIXES.md
-LATEST_UPDATES.md
-
-.env.example

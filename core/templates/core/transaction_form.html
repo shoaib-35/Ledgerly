@@ -2,12 +2,7 @@
 {% block title %}{% if transaction %}Edit{% else %}Add{% endif %} Transaction | Ledgerly{% endblock %}
 {% block heading %}{% if transaction %}Edit transaction{% else %}Add transaction{% endif %}{% endblock %}
 {% block content %}
-<section class="action-section form-actions-section" aria-label="Transaction actions">
-    <div class="action-grid action-grid-two">
-        <a class="action-card compact" href="/money-transfers/new/"><span class="action-icon">↔</span><span><strong>Money transfer</strong><small>Move money between accounts</small></span></a>
-        <a class="action-card compact" href="/card-payments/new/"><span class="action-icon">▣</span><span><strong>Card payment</strong><small>Restore available card credit</small></span></a>
-    </div>
-</section>
+
 
 <section class="form-panel wide-form">
     <p class="section-kicker">Every change updates derived balances atomically</p>
@@ -50,5 +45,11 @@
 
         <div class="form-actions"><a href="/transactions/">Cancel</a><button type="submit">{% if transaction %}Save changes{% else %}Save transaction{% endif %}</button></div>
     </form>
+</section>
+<section class="action-section form-actions-section" aria-label="Transaction actions">
+    <div class="action-grid action-grid-two">
+        <a class="action-card compact" href="/money-transfers/new/"><span class="action-icon">↔</span><span><strong>Money transfer</strong><small>Move money between accounts</small></span></a>
+        <a class="action-card compact" href="/card-payments/new/"><span class="action-icon">▣</span><span><strong>Card payment</strong><small>Restore available card credit</small></span></a>
+    </div>
 </section>
 {% endblock %}

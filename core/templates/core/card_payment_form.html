@@ -2,13 +2,7 @@
 {% block title %}Card Pay | Expense Tracker{% endblock %}
 {% block heading %}Pay card{% endblock %}
 {% block content %}
-<section class="action-section form-actions-section" aria-label="Transaction actions">
-    <div class="action-grid action-grid-three">
-        <a class="action-card compact" href="/transactions/new/"><span class="action-icon">＋</span><span><strong>Add transaction</strong><small>Record an expense or money received</small></span></a>
-        <a class="action-card compact" href="/money-transfers/new/"><span class="action-icon">↔</span><span><strong>Money transfer</strong><small>Move money between accounts</small></span></a>
-        <a class="action-card compact active" href="/card-payments/new/"><span class="action-icon">▣</span><span><strong>Card payment</strong><small>Restore available card credit</small></span></a>
-    </div>
-</section>
+
 
 <section class="form-panel">
     <p class="section-kicker">Restore borrowing capacity</p>
@@ -23,5 +17,11 @@
         <label>Description<textarea name="description" rows="3">Card payment</textarea></label>
         <div class="form-actions"><a href="/transactions/">Cancel</a><button type="submit">Pay card</button></div>
     </form>
+</section>
+<section class="action-section form-actions-section" aria-label="Transaction actions">
+    <div class="action-grid action-grid-two">
+        <a class="action-card compact" href="/transactions/new/"><span class="action-icon">＋</span><span><strong>Add transaction</strong><small>Record an expense or money received</small></span></a>
+        <a class="action-card compact" href="/money-transfers/new/"><span class="action-icon">↔</span><span><strong>Money transfer</strong><small>Move money between accounts</small></span></a>
+    </div>
 </section>
 {% endblock %}

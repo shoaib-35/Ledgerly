@@ -5,8 +5,7 @@
 {% block content %}
 <section class="form-panel wide-form transfer-panel">
     <div class="action-intro">
-        <div><p class="section-kicker">Move money between your financial accounts</p><p class="intro-copy">Transfer funds between bank accounts and credit cards without treating the movement as income or an expense.</p></div>
-        <a class="secondary-action" href="/transactions/new/">Add transaction</a>
+    <p class="intro-copy">Move money between your financial accounts</p>
     </div>
     {% if error %}<p class="form-error">{{ error }}</p>{% endif %}
     <form method="post">
@@ -28,5 +27,11 @@
         <p class="field-hint">Transfers update both accounts atomically. A bank source decreases its balance; a card source increases its used credit. The destination receives the corresponding amount.</p>
         <div class="form-actions"><a href="/transactions/">Cancel</a><button type="submit">{% if transaction %}Save transfer{% else %}Transfer money{% endif %}</button></div>
     </form>
+</section>
+<section class="action-section form-actions-section" aria-label="Transaction actions">
+    <div class="action-grid action-grid-two">
+        <a class="action-card compact" href="/transactions/new/"><span class="action-icon">＋</span><span><strong>Add transaction</strong><small>Record an expense or money received</small></span></a>
+        <a class="action-card compact active" href="/card-payments/new/"><span class="action-icon">▣</span><span><strong>Card payment</strong><small>Restore available card credit</small></span></a>
+    </div>
 </section>
 {% endblock %}

@@ -4,17 +4,7 @@
 {% block heading %}Transactions{% endblock %}
 {% block content %}
 <section class="intro-band compact-intro"><p class="section-kicker">Financial history</p><p class="intro-copy">Search and review every active and voided financial event.</p></section>
-<section class="action-section transaction-tools" aria-labelledby="transaction-data-title">
-    <div class="section-heading">
-        <div><p class="section-kicker">Data management</p><h2 id="transaction-data-title">Import &amp; export</h2></div>
-    </div>
-    <div class="action-grid action-grid-three">
-        <a class="action-card compact" href="/transactions/import/"><span class="action-icon">⇧</span><span><strong>Import transactions</strong><small>CSV, XLS or XLSX</small></span><span class="action-chevron">›</span></a>
-        <a class="action-card compact" href="/transactions/export/?format=xlsx"><span class="action-icon">↓</span><span><strong>Export XLSX</strong><small>Excel workbook</small></span><span class="action-chevron">›</span></a>
-        <a class="action-card compact" href="/transactions/export/?format=csv"><span class="action-icon">↓</span><span><strong>Export CSV</strong><small>Universal spreadsheet format</small></span><span class="action-chevron">›</span></a>
-    </div>
-    <p class="muted transaction-tools-note">Need the legacy Excel format? <a href="/transactions/export/?format=xls">Export XLS</a></p>
-</section>
+
 
 <section class="content-section" aria-labelledby="transaction-list-title">
     <div class="section-heading"><div><p class="section-kicker">Financial history</p><h2 id="transaction-list-title">Recent activity</h2></div><a href="/transactions/new/">+ Add transaction</a></div>
@@ -62,5 +52,16 @@
         {% endwith %}
         {% empty %}<p class="empty-state">No transactions match these filters.</p>{% endfor %}
     </div>
+</section>
+<section class="action-section transaction-tools" aria-labelledby="transaction-data-title">
+    <div class="section-heading">
+        <div><p class="section-kicker">Data management</p><h2 id="transaction-data-title">Import &amp; export</h2></div>
+    </div>
+    <div class="action-grid action-grid-three">
+        <a class="action-card compact" href="/transactions/import/"><span class="action-icon">⇧</span><span><strong>Import transactions</strong><small>CSV, XLS or XLSX</small></span><span class="action-chevron">›</span></a>
+        <a class="action-card compact" href="/transactions/export/?format=xlsx"><span class="action-icon">↓</span><span><strong>Export XLSX</strong><small>Excel workbook</small></span><span class="action-chevron">›</span></a>
+        <a class="action-card compact" href="/transactions/export/?format=csv"><span class="action-icon">↓</span><span><strong>Export CSV</strong><small>Universal spreadsheet format</small></span><span class="action-chevron">›</span></a>
+    </div>
+    <p class="muted transaction-tools-note">Need the legacy Excel format? <a href="/transactions/export/?format=xls">Export XLS</a></p>
 </section>
 {% endblock %}

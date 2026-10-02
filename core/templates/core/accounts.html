@@ -12,7 +12,7 @@
     </div>
 </section>
 <section class="content-section" aria-labelledby="accounts-list-title">
-    <div class="section-heading"><h2 id="accounts-list-title">All accounts</h2><a href="/accounts/new/">+ Add account</a></div>
+    <div class="section-heading"><h2 id="accounts-list-title">All accounts</h2></div>
     <div class="account-list page-list">
         {% for account in accounts %}
         {% with summary=summaries|get_item:account.id %}
